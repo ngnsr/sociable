@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: sociable
+
+  datasource:
+    url: jdbc:postgresql://db:5432/sociable
+    username: dev-user
+    password: dev-password
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+server:
+  port: 5555
