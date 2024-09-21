@@ -1,6 +1,6 @@
-import com.rr.sociable.exception.ConflictException;
-import com.rr.sociable.exception.InvalidJwtTokenException;
-import com.rr.sociable.exception.NotFoundException;
+package com.rr.sociable;
+
+import com.rr.sociable.exception.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,6 +63,28 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
         Map<String, Object> body = Map.of(
                 "timestamp", new Date(),
                 "status", HttpStatus.BAD_REQUEST,
+                "errors", List.of(ex.getMessage())
+        );
+
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserAlreadyInGroupException.class)
+    public ResponseEntity<Object> handleUserAlreadyInGroupException(UserAlreadyInGroupException ex) {
+        Map<String, Object> body = Map.of(
+                "timestamp", new Date(),
+                "status", HttpStatus.FORBIDDEN,
+                "errors", List.of(ex.getMessage())
+        );
+
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserNotInGroupException.class)
+    public ResponseEntity<Object> handleUserNotInGroupException(UserNotInGroupException ex) {
+        Map<String, Object> body = Map.of(
+                "timestamp", new Date(),
+                "status", HttpStatus.FORBIDDEN,
                 "errors", List.of(ex.getMessage())
         );
 

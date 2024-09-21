@@ -1,52 +1,64 @@
 package com.rr.sociable.controller;
 
+import com.rr.sociable.dto.MessageDetailsDto;
+import com.rr.sociable.dto.MessageDto;
+import com.rr.sociable.dto.MessageSmallDto;
+import com.rr.sociable.dto.PageDto;
 import com.rr.sociable.entity.Message;
+import com.rr.sociable.mapper.MessageMapper;
 import com.rr.sociable.service.MessageService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/messages")
 public class MessageController {
     private final MessageService messageService;
+    private final MessageMapper messageMapper;
 
-    public MessageController(MessageService messageService) {
+    public MessageController(MessageService messageService, MessageMapper messageMapper) {
         this.messageService = messageService;
+        this.messageMapper = messageMapper;
     }
 
     @GetMapping
-    public Page<Message> getAllMessages(@RequestParam Integer page,
+    public PageDto<MessageSmallDto> getAllMessages(@RequestParam Integer page,
                                         @RequestParam Integer size) {
-        Pageable pageable = PageRequest.of(page,size);
-        return messageService.findAll(pageable);
+        final Pageable pageable = PageRequest.of(page,size);
+        final Page<Message> messages = messageService.findAll(pageable);
+        final List<MessageSmallDto> dtos = messages.get().map(messageMapper::toSmall).toList();
+        return PageDto.from(new PageImpl<>(dtos, pageable, messages.getTotalElements()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Message> getMessageById(@PathVariable Long id) {
+    public MessageDetailsDto getMessageById(@PathVariable Long id) {
         Message message = messageService.findById(id);
-        return message != null ? ResponseEntity.ok(message) : ResponseEntity.notFound().build();
+        return messageMapper.toDetails(message);
     }
 
     @PostMapping
-    public ResponseEntity<Message> createMessage(@RequestBody Message message) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public MessageDetailsDto createMessage(@RequestBody @Valid MessageDto message) {
         Message savedMessage = messageService.save(message);
-        return ResponseEntity.status(201).body(savedMessage);
+        return messageMapper.toDetails(savedMessage);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Message> updateMessage(@PathVariable Long id, @RequestBody Message message) {
-        message.setId(id);
-        Message updatedMessage = messageService.save(message);
-        return ResponseEntity.ok(updatedMessage);
+    public MessageSmallDto updateMessage(@PathVariable Long id, @RequestBody @Valid MessageDto message) throws Exception {
+        throw new Exception();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMessage(@PathVariable Long id) {
+    public void deleteMessage(@PathVariable Long id) {
         messageService.delete(id);
-        return ResponseEntity.noContent().build();
     }
 }
