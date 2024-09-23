@@ -6,5 +6,5 @@ import lombok.Data;
 public class MessageDto {
     private String content;
     private Long groupId;
-    private Long authorId;
+    private Long userId;
 }

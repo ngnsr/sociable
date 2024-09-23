@@ -6,6 +6,7 @@ import com.rr.sociable.dto.MessageSmallDto;
 import com.rr.sociable.dto.PageDto;
 import com.rr.sociable.entity.Message;
 import com.rr.sociable.mapper.MessageMapper;
+import com.rr.sociable.service.MessageProducerService;
 import com.rr.sociable.service.MessageService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -24,10 +25,12 @@ import java.util.List;
 public class MessageController {
     private final MessageService messageService;
     private final MessageMapper messageMapper;
+    private final MessageProducerService messageProducerService;
 
-    public MessageController(MessageService messageService, MessageMapper messageMapper) {
+    public MessageController(MessageService messageService, MessageMapper messageMapper, MessageProducerService messageProducerService) {
         this.messageService = messageService;
         this.messageMapper = messageMapper;
+        this.messageProducerService = messageProducerService;
     }
 
     @GetMapping
@@ -47,9 +50,13 @@ public class MessageController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public MessageDetailsDto createMessage(@RequestBody @Valid MessageDto message) {
-        Message savedMessage = messageService.save(message);
-        return messageMapper.toDetails(savedMessage);
+    public String createMessage(@RequestBody @Valid MessageDto message) {
+        // kafka
+        System.err.println("controller");
+        messageProducerService.sendMessage(message);
+        return "Ok";
+//        Message savedMessage = messageService.save(message);
+//        return messageMapper.toDetails(savedMessage);
     }
 
     @PutMapping("/{id}")
