@@ -9,5 +9,5 @@ public class MessageSmallDto {
     private Long id;
     private String content;
     private Long groupId;
-    private Long authorId;
+    private Long userId;
 }

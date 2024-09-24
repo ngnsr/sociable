@@ -90,4 +90,15 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
 
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(InvalidArgumentException.class)
+    public ResponseEntity<Object> handleUserNotInGroupException(InvalidArgumentException ex) {
+        Map<String, Object> body = Map.of(
+                "timestamp", new Date(),
+                "status", HttpStatus.BAD_REQUEST,
+                "errors", List.of(ex.getMessage())
+        );
+
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
 }

@@ -1,29 +1,33 @@
 package com.rr.sociable.service;
 
 import com.rr.sociable.dto.GroupDto;
-import com.rr.sociable.dto.MessageSmallDto;
 import com.rr.sociable.entity.Group;
+import com.rr.sociable.entity.Message;
 import com.rr.sociable.entity.User;
 import com.rr.sociable.exception.NotFoundException;
 import com.rr.sociable.exception.UserAlreadyInGroupException;
-import com.rr.sociable.mapper.GroupMapper;
 import com.rr.sociable.repo.GroupRepository;
+import com.rr.sociable.repo.MessageRepository;
 import com.rr.sociable.repo.UserRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Pageable;
+
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
 public class GroupService {
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
+    private final MessageRepository messageRepository;
 
-    public GroupService(GroupRepository groupRepository, UserRepository userRepository) {
+    public GroupService(GroupRepository groupRepository, UserRepository userRepository, MessageRepository messageRepository) {
         this.groupRepository = groupRepository;
         this.userRepository = userRepository;
+        this.messageRepository = messageRepository;
     }
 
     public List<Group> findAll() {
@@ -71,11 +75,12 @@ public class GroupService {
     public List<Group> findAllById(Iterable<Long> groupIds) {
         return groupRepository.findAllById(groupIds);
     }
-//
-//    public List<MessageSmallDto> getMessagesByGroupId(Long groupId) {
-//        Group group = groupRepository.findById(groupId)
-//                .orElseThrow(() -> new NotFoundException("Group not found"));
-//        return group.getM;
-//    }
+
+    public Page<Message> getMessagesByGroupId(Pageable pageable, Long groupId) {
+        groupRepository.findById(groupId)
+                .orElseThrow(() -> new NotFoundException("Group not found"));
+
+        return messageRepository.findAllByGroupId(pageable, groupId);
+    }
 
 }

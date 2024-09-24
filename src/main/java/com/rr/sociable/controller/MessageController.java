@@ -5,6 +5,7 @@ import com.rr.sociable.dto.MessageDto;
 import com.rr.sociable.dto.MessageSmallDto;
 import com.rr.sociable.dto.PageDto;
 import com.rr.sociable.entity.Message;
+import com.rr.sociable.exception.InvalidArgumentException;
 import com.rr.sociable.mapper.MessageMapper;
 import com.rr.sociable.service.MessageProducerService;
 import com.rr.sociable.service.MessageService;
@@ -13,7 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Pageable;
@@ -36,6 +36,9 @@ public class MessageController {
     @GetMapping
     public PageDto<MessageSmallDto> getAllMessages(@RequestParam Integer page,
                                         @RequestParam Integer size) {
+        if(page < 0) throw new InvalidArgumentException("Page number should be >= 0");
+        if(size < 1) throw new InvalidArgumentException("Page size should be >= 1");
+
         final Pageable pageable = PageRequest.of(page,size);
         final Page<Message> messages = messageService.findAll(pageable);
         final List<MessageSmallDto> dtos = messages.get().map(messageMapper::toSmall).toList();
@@ -51,8 +54,6 @@ public class MessageController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public String createMessage(@RequestBody @Valid MessageDto message) {
-        // kafka
-        System.err.println("controller");
         messageProducerService.sendMessage(message);
         return "Ok";
 //        Message savedMessage = messageService.save(message);
@@ -66,6 +67,7 @@ public class MessageController {
 
     @DeleteMapping("/{id}")
     public void deleteMessage(@PathVariable Long id) {
-        messageService.delete(id);
+        messageProducerService.deleteMessage(id);
     }
+
 }

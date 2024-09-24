@@ -1,13 +1,9 @@
 package com.rr.sociable.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.rr.sociable.dto.MessageDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -18,6 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @Table(name = "app_message")
+@ToString
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,10 +28,12 @@ public class Message {
 
     private Long groupId;
 
-    private Long authorId;
+    private Long userId;
 
     public Message(MessageDto messageDto){
         content = messageDto.getContent();
+        groupId = messageDto.getGroupId();
+        userId = messageDto.getUserId();
     }
 
 }

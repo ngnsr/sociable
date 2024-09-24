@@ -8,14 +8,23 @@ import org.springframework.stereotype.Service;
 public class MessageProducerService {
 
     private static final String TOPIC = "group-messages";
-    private final KafkaTemplate<String, MessageDto> kafkaTemplate;
+    private static final String DELETE_TOPIC = "group-messages-delete";
 
-    public MessageProducerService(KafkaTemplate<String, MessageDto> kafkaTemplate) {
-        this.kafkaTemplate = kafkaTemplate;
+    private final KafkaTemplate<String, MessageDto> messageDtoKafkaTemplate;
+    private final KafkaTemplate<String, Long> idKafkaTemplate;
+
+
+    public MessageProducerService(KafkaTemplate<String, MessageDto> kafkaTemplate, KafkaTemplate<String, Long> idKafkaTemplate) {
+        this.messageDtoKafkaTemplate = kafkaTemplate;
+        this.idKafkaTemplate = idKafkaTemplate;
+        System.err.println(messageDtoKafkaTemplate.hashCode() == idKafkaTemplate.hashCode());
     }
 
     public void sendMessage(MessageDto messageDto) {
-        System.err.println("producer");
-        kafkaTemplate.send(TOPIC, messageDto);
+        messageDtoKafkaTemplate.send(TOPIC, messageDto);
+    }
+
+    public void deleteMessage(Long id) {
+        idKafkaTemplate.send(DELETE_TOPIC, id);
     }
 }

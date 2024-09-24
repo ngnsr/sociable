@@ -11,6 +11,7 @@ import java.util.Optional;
 public interface MessageRepository extends PagingAndSortingRepository<Message, Long> {
 
     Page<Message> findAll(Pageable pageable);
+    Page<Message> findAllByGroupId(Pageable pageable, Long id);
 
     Optional<Message> findById(Long id);
 

@@ -7,7 +7,6 @@ spring:
     username: dev-user
     password: dev-password
 
-
   jpa:
     hibernate:
       ddl-auto: update
