@@ -17,7 +17,6 @@ public class MessageProducerService {
     public MessageProducerService(KafkaTemplate<String, MessageDto> kafkaTemplate, KafkaTemplate<String, Long> idKafkaTemplate) {
         this.messageDtoKafkaTemplate = kafkaTemplate;
         this.idKafkaTemplate = idKafkaTemplate;
-        System.err.println(messageDtoKafkaTemplate.hashCode() == idKafkaTemplate.hashCode());
     }
 
     public void sendMessage(MessageDto messageDto) {

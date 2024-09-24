@@ -10,6 +10,7 @@ import com.rr.sociable.service.GroupService;
 import jakarta.validation.Valid;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
@@ -76,14 +77,15 @@ public class GroupController {
     }
 
     @GetMapping("/{id}/messages")
-    public PageDto<MessageSmallDto> getMessagesByGroupId(@RequestParam(required = false, defaultValue = "0") Integer page,
+    public Page<MessageSmallDto> getMessagesByGroupId(@RequestParam(required = false, defaultValue = "0") Integer page,
                                                          @RequestParam(required = false, defaultValue = "100") Integer size, @PathVariable Long id){
         if(page < 0) throw new InvalidArgumentException("Page number should be >= 0");
         if(size < 1) throw new InvalidArgumentException("Page size should be >= 1");
         PageRequest pageRequest = PageRequest.of(page, size);
-        List<MessageSmallDto> messages = groupService.getMessagesByGroupId(pageRequest, id)
-                .stream().map(messageMapper::toSmall).toList();
-        return PageDto.from(new PageImpl<>(messages, pageRequest,messages.size()));
+        Page<Message> messages = groupService.getMessagesByGroupId(pageRequest, id);
+        List<MessageSmallDto> dtos = messages.get()
+                .map(messageMapper::toSmall).toList();
+        return new PageImpl<>(dtos, pageRequest, messages.getTotalElements());
     }
 
 }
