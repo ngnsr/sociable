@@ -16,32 +16,32 @@ public class SecurityConfig {
         this.userService = userService;
     }
 
-//    @Bean
-//    public SecurityFilterChain filterSecurity(HttpSecurity http) throws Exception {
-//        http.authorizeHttpRequests((authorize) -> authorize.anyRequest().permitAll());
-//        return http.build();
-//    }
-
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http
-                .authorizeHttpRequests(authz -> authz
-                                .anyRequest().authenticated()
-                )
-                .logout(l -> l.logoutSuccessUrl("/login"))
-//                .oauth2ResourceServer((oauth2) -> oauth2
-//                        .jwt(withDefaults())
-//                )
-                .oauth2Login(oauth2 -> oauth2
-                        .userInfoEndpoint(
-                                (userInfoEndpointConfig -> userInfoEndpointConfig
-                                        .userService(userService))
-                        )
-                        .defaultSuccessUrl("/")
-                        .failureUrl("/login?error")
-                )
-                .build();
+    public SecurityFilterChain filterSecurity(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests((authorize) -> authorize.anyRequest().permitAll());
+        return http.build();
     }
+
+//    @Bean
+//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//        return http
+//                .authorizeHttpRequests(authz -> authz
+//                                .anyRequest().authenticated()
+//                )
+//                .logout(l -> l.logoutSuccessUrl("/login"))
+////                .oauth2ResourceServer((oauth2) -> oauth2
+////                        .jwt(withDefaults())
+////                )
+//                .oauth2Login(oauth2 -> oauth2
+//                        .userInfoEndpoint(
+//                                (userInfoEndpointConfig -> userInfoEndpointConfig
+//                                        .userService(userService))
+//                        )
+//                        .defaultSuccessUrl("/")
+//                        .failureUrl("/login?error")
+//                )
+//                .build();
+//    }
 
     @Bean
     ApplicationListener<AuthenticationSuccessEvent> successListener() {
