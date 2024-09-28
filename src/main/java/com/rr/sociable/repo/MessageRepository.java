@@ -15,7 +15,8 @@ public interface MessageRepository extends PagingAndSortingRepository<Message, L
 
     Optional<Message> findById(Long id);
 
-    Message save(Message message);
+    Optional<Message> save(Message message);
 
     void deleteById(Long id);
+    void deleteMessageByGroupId(Long id);
 }

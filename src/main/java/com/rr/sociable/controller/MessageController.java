@@ -3,8 +3,10 @@ package com.rr.sociable.controller;
 import com.rr.sociable.dto.MessageDetailsDto;
 import com.rr.sociable.dto.MessageDto;
 import com.rr.sociable.dto.MessageSmallDto;
+import com.rr.sociable.dto.MessageUpdateDto;
 import com.rr.sociable.entity.Message;
 import com.rr.sociable.exception.InvalidArgumentException;
+import com.rr.sociable.exception.NotFoundException;
 import com.rr.sociable.mapper.MessageMapper;
 import com.rr.sociable.service.MessageProducerService;
 import com.rr.sociable.service.MessageService;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/messages")
@@ -46,22 +49,25 @@ public class MessageController {
 
     @GetMapping("/{id}")
     public MessageDetailsDto getMessageById(@PathVariable Long id) {
-        Message message = messageService.findById(id);
-        return messageMapper.toDetails(message);
+        Optional<Message> message = messageService.findById(id);
+        if(message.isEmpty()) {
+            throw new NotFoundException("Message with id %d not found".formatted(id));
+        }
+        return messageMapper.toDetails(message.orElse(null));
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public String createMessage(@RequestBody @Valid MessageDto message) {
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void createMessage(@RequestBody @Valid MessageDto message) {
         messageProducerService.sendMessage(message);
-        return "Ok";
-//        Message savedMessage = messageService.save(message);
-//        return messageMapper.toDetails(savedMessage);
     }
 
     @PutMapping("/{id}")
-    public MessageSmallDto updateMessage(@PathVariable Long id, @RequestBody @Valid MessageDto message) throws Exception {
-        throw new Exception();
+    public String updateMessage(@PathVariable Long id, @RequestBody @Valid MessageDto message) {
+        MessageUpdateDto messageUpdateDto = new MessageUpdateDto(id, message);
+
+        messageProducerService.updateMessage(messageUpdateDto);
+        return "Ok";
     }
 
     @DeleteMapping("/{id}")

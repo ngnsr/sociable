@@ -22,7 +22,6 @@ public class Group {
     private Long id;
 
     @NotBlank
-    @Column(unique = true)
     private String name;
 
     public Group(GroupDto groupDto){

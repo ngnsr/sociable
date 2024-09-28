@@ -5,6 +5,7 @@ import com.rr.sociable.dto.UserDto;
 import com.rr.sociable.dto.UserSmallDto;
 import com.rr.sociable.entity.User;
 import com.rr.sociable.exception.ConflictException;
+import com.rr.sociable.exception.NotFoundException;
 import com.rr.sociable.mapper.UserMapper;
 import com.rr.sociable.service.UserService;
 import jakarta.validation.Valid;
@@ -33,8 +34,11 @@ public class UserController {
 
     @GetMapping("/{id}")
     public UserDetailsDto getUserById(@PathVariable Long id) {
-        User user = userService.findById(id);
-        return userMapper.toDetails(user);
+        Optional<User> user = userService.findById(id);
+
+        if(user.isEmpty()) throw new NotFoundException("User not found");
+
+        return userMapper.toDetails(user.orElse(null));
     }
 
     @PostMapping
@@ -47,12 +51,6 @@ public class UserController {
 
         User saved = userService.save(userDto);
         return userMapper.toSmall(saved);
-    }
-
-    @PutMapping("/{id}")
-    public UserSmallDto updateUser(@PathVariable Long id, @RequestBody @Valid UserDto userDto) {
-        User updatedUser = userService.update(userDto);
-        return userMapper.toSmall(updatedUser);
     }
 
     @DeleteMapping("/{id}")

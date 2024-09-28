@@ -4,5 +4,6 @@ import lombok.Data;
 
 @Data
 public class GroupDto {
+    private Long creatorId;
     private String name;
 }

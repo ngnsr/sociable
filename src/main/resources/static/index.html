@@ -31,7 +31,7 @@
     stompClient.connect({}, function (frame) {
       console.log('Connected: ' + frame);
 
-      stompClient.subscribe('/topic/messages/2', async function (message) {
+      stompClient.subscribe('/topic/messages/1', async function (message) {
         showMessage(message.body);
       });
     });

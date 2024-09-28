@@ -1,6 +1,7 @@
 package com.rr.sociable.config;
 
 import com.rr.sociable.dto.MessageDto;
+import com.rr.sociable.dto.MessageUpdateDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
@@ -19,14 +20,17 @@ public class KafkaConfig {
     @Value(value = "${spring.kafka.bootstrap-servers}")
     private String bootstrapAddress;
 
-    private final ProducerFactory<String, MessageDto> messageDtoProducerFactory;
-    private final ProducerFactory<String, Long> longProducerFactory;
-
     public KafkaConfig(ProducerFactory<String, MessageDto> messageDtoProducerFactory,
-                               ProducerFactory<String, Long> stringProducerFactory) {
+                       ProducerFactory<String, Long> stringProducerFactory, ProducerFactory<String, MessageUpdateDto> messageUpdateDtoProducerFactory) {
         this.messageDtoProducerFactory = messageDtoProducerFactory;
         this.longProducerFactory = stringProducerFactory;
+        this.messageUpdateDtoProducerFactory = messageUpdateDtoProducerFactory;
     }
+
+    private final ProducerFactory<String, MessageDto> messageDtoProducerFactory;
+    private final ProducerFactory<String, Long> longProducerFactory;
+    private final ProducerFactory<String, MessageUpdateDto> messageUpdateDtoProducerFactory;
+
 
     @Bean
     public KafkaAdmin kafkaAdmin() {
@@ -37,12 +41,17 @@ public class KafkaConfig {
 
     @Bean
     public NewTopic topic1() {
-        return new NewTopic("group-messages", 1, (short) 1);
+        return new NewTopic("group-messages-create", 1, (short) 1);
     }
 
-
+    @Bean
     public NewTopic topic2() {
         return new NewTopic("group-messages-delete", 1, (short) 1);
+    }
+
+    @Bean
+    public NewTopic topic3() {
+        return new NewTopic("group-messages-update", 1, (short) 1);
     }
 
 
@@ -54,5 +63,10 @@ public class KafkaConfig {
     @Bean
     public KafkaTemplate<String, Long> stringKafkaTemplate() {
         return new KafkaTemplate<>(longProducerFactory);
+    }
+
+    @Bean
+    public KafkaTemplate<String, MessageUpdateDto> messageUpdateDtoKafkaTemplate() {
+        return new KafkaTemplate<>(messageUpdateDtoProducerFactory);
     }
 }

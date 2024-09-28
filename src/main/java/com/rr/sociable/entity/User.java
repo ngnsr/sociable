@@ -32,13 +32,9 @@ public class User {
     @Column(unique = true)
     private String email;
 
-    @NotBlank
-    private String password;
-
     public User(UserDto userDto){
         username = userDto.getUsername();
         email = userDto.getEmail();
-        password = userDto.getPassword();
     }
 
     @ElementCollection(fetch = FetchType.EAGER)
