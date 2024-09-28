@@ -3,13 +3,42 @@ spring:
     name: to-do
 
   datasource:
-    url: jdbc:postgresql://db:5432/todo
-    username: dev-user
-    password: dev-password
+    url: jdbc:postgresql://db:5432/sociable
+    username: <DB_USER>
+    password: <DB_PASSWORD>
 
   jpa:
     hibernate:
       ddl-auto: update
+
+  kafka:
+    bootstrap-servers: localhost:29092
+    consumer:
+      auto-offset-reset: earliest
+      group-id: "chat_group"
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+    producer:
+      acks: -1
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: <GOOGLE_CLIENT_ID>
+            client-secret: <GOOGLE_CLIENT_SECRET>
+            scope: profile, email
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
 
 server:
   port: 5555

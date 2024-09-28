@@ -1,52 +1,78 @@
 package com.rr.sociable.controller;
 
+import com.rr.sociable.dto.MessageDetailsDto;
+import com.rr.sociable.dto.MessageDto;
+import com.rr.sociable.dto.MessageSmallDto;
+import com.rr.sociable.dto.MessageUpdateDto;
 import com.rr.sociable.entity.Message;
+import com.rr.sociable.exception.InvalidArgumentException;
+import com.rr.sociable.exception.NotFoundException;
+import com.rr.sociable.mapper.MessageMapper;
+import com.rr.sociable.service.MessageProducerService;
 import com.rr.sociable.service.MessageService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/messages")
 public class MessageController {
     private final MessageService messageService;
+    private final MessageMapper messageMapper;
+    private final MessageProducerService messageProducerService;
 
-    public MessageController(MessageService messageService) {
+    public MessageController(MessageService messageService, MessageMapper messageMapper, MessageProducerService messageProducerService) {
         this.messageService = messageService;
+        this.messageMapper = messageMapper;
+        this.messageProducerService = messageProducerService;
     }
 
     @GetMapping
-    public Page<Message> getAllMessages(@RequestParam Integer page,
+    public Page<MessageSmallDto> getAllMessages(@RequestParam Integer page,
                                         @RequestParam Integer size) {
-        Pageable pageable = PageRequest.of(page,size);
-        return messageService.findAll(pageable);
+        if(page < 0) throw new InvalidArgumentException("Page number should be >= 0");
+        if(size < 1) throw new InvalidArgumentException("Page size should be >= 1");
+
+        final Pageable pageable = PageRequest.of(page,size);
+        final Page<Message> messages = messageService.findAll(pageable);
+        final List<MessageSmallDto> dtos = messages.get().map(messageMapper::toSmall).toList();
+        return new PageImpl<>(dtos, pageable, messages.getTotalElements());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Message> getMessageById(@PathVariable Long id) {
-        Message message = messageService.findById(id);
-        return message != null ? ResponseEntity.ok(message) : ResponseEntity.notFound().build();
+    public MessageDetailsDto getMessageById(@PathVariable Long id) {
+        Optional<Message> message = messageService.findById(id);
+        if(message.isEmpty()) {
+            throw new NotFoundException("Message with id %d not found".formatted(id));
+        }
+        return messageMapper.toDetails(message.orElse(null));
     }
 
     @PostMapping
-    public ResponseEntity<Message> createMessage(@RequestBody Message message) {
-        Message savedMessage = messageService.save(message);
-        return ResponseEntity.status(201).body(savedMessage);
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void createMessage(@RequestBody @Valid MessageDto message) {
+        messageProducerService.sendMessage(message);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Message> updateMessage(@PathVariable Long id, @RequestBody Message message) {
-        message.setId(id);
-        Message updatedMessage = messageService.save(message);
-        return ResponseEntity.ok(updatedMessage);
+    public String updateMessage(@PathVariable Long id, @RequestBody @Valid MessageDto message) {
+        MessageUpdateDto messageUpdateDto = new MessageUpdateDto(id, message);
+
+        messageProducerService.updateMessage(messageUpdateDto);
+        return "Ok";
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMessage(@PathVariable Long id) {
-        messageService.delete(id);
-        return ResponseEntity.noContent().build();
+    public void deleteMessage(@PathVariable Long id) {
+        messageProducerService.deleteMessage(id);
     }
+
 }

@@ -1,10 +1,10 @@
 package com.rr.sociable.entity;
 
+import com.rr.sociable.dto.MessageDto;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -13,20 +13,27 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Table(name = "app_message")
+@ToString
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
     private String content;
 
+    @CreationTimestamp
     private LocalDateTime timestamp;
 
-    @ManyToOne
-    @JoinColumn(name = "group_id")
-    private Group group;
+    private Long groupId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User author;
+    private Long userId;
+
+    public Message(MessageDto messageDto){
+        content = messageDto.getContent();
+        groupId = messageDto.getGroupId();
+        userId = messageDto.getUserId();
+    }
+
 }
