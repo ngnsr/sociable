@@ -21,8 +21,8 @@ jobs:
           sed -i 's/<DB_USER>/${{ secrets.DB_USER }}/' src/main/resources/application.yml
           sed -i 's/<DB_USER>/${{ secrets.DB_USER }}/' compose.yml
           sed -i 's/<DB_PASSWORD>/${{ secrets.DB_PASSWORD }}/' src/main/resources/application.yml
-          sed -i 's/<DB_USER>/${{ secrets.DB_USER }}/' compose.yml
-          sed -i 's/<DB_PASSWORD>/${{ secrets.DB_ADMIN_PASSWORD }}/' compose.yml
+          sed -i 's/<DB_PASSWORD>/${{ secrets.DB_PASSWORD }}/' compose.yml
+          sed -i 's/<DB_ADMIN_PASSWORD>/${{ secrets.DB_ADMIN_PASSWORD }}/' compose.yml
           sed -i 's/<GOOGLE_CLIENT_ID>/${{ secrets.GOOGLE_CLIENT_ID }}/' src/main/resources/application.yml
           sed -i 's/<GOOGLE_CLIENT_SECRET>/${{ secrets.GOOGLE_CLIENT_SECRET }}/' src/main/resources/application.yml
           sed -i 's/<DOCKER_HUB_USERNAME>/${{ secrets.DOCKER_HUB_USERNAME }}/' compose.yml
@@ -49,8 +49,8 @@ jobs:
       - name: Substitute github secrets
         run: |
           sed -i 's/<DB_USER>/${{ secrets.DB_USER }}/' compose.yml
-          sed -i 's/<DB_USER>/${{ secrets.DB_USER }}/' compose.yml
-          sed -i 's/<DB_PASSWORD>/${{ secrets.DB_ADMIN_PASSWORD }}/' compose.yml
+          sed -i 's/<DB_PASSWORD>/${{ secrets.DB_PASSWORD }}/' compose.yml
+          sed -i 's/<DB_ADMIN_PASSWORD>/${{ secrets.DB_ADMIN_PASSWORD }}/' compose.yml
           sed -i 's/<DOCKER_HUB_USERNAME>/${{ secrets.DOCKER_HUB_USERNAME }}/' compose.yml
 
       - name: Copy docker-compose to server
