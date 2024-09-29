@@ -18,7 +18,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "compose.yml"
-          target: /home/admin/folderdontexist
+          target: /home/admin/${{ github.event.repository.name }}
 
 
 #  build:
