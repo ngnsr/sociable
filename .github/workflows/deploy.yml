@@ -72,11 +72,11 @@ jobs:
           source: "compose.yml"
           target: "/home/admin/.deploy/${{ github.event.repository.name }}/"
 
-      - name: Deploy to Server via SSH
-        uses: appleboy/ssh-action@v0.1.8
-        env:
-          APPTOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-          USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+      - name: SSH to EC2 instance and Deploy Docker Container
+        uses: appleboy/ssh-action@v0.1.7
+#        env:
+#          APPTOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+#          USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
@@ -84,8 +84,8 @@ jobs:
           port: 22
           script: |
             echo "test" > test
-            echo $APPTOKEN | docker login -u $USERNAME --password-stdin
-            cd ~/.deploy/${{ github.event.repository.name }}
-            docker compose -f ./compose.yml pull
-            docker compose -f ./compose.yml up -d
-            docker image prune
+#            echo $APPTOKEN | docker login -u $USERNAME --password-stdin
+#            cd ~/.deploy/${{ github.event.repository.name }}
+#            docker compose -f ./compose.yml pull
+#            docker compose -f ./compose.yml up -d
+#            docker image prune
