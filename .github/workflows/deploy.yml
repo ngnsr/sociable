@@ -54,6 +54,7 @@ jobs:
           docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/backend:latest .
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/backend:latest
 
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
