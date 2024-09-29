@@ -50,7 +50,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "./compose.yml"
+          source: "."
 #          target: "/home/admin/.deploy/${{ github.event.repository.name }}/"
           target: "/home/admin/.deploy/"
 
