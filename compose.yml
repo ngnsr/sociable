@@ -4,6 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: <DOCKER_HUB_USERNAME>/backend:latest
     ports:
       - "80:80"
     depends_on:
