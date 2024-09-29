@@ -11,14 +11,10 @@ jobs:
 
     steps:
       - name: Copy docker-compose to server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          port: 22
-          source: "compose.yml"
-          target: "/home/admin/.deploy/"
+        run: |
+          echo ${{ secrets.EC2_SSH_KEY  }} | tr -d '\r' | ssh-add -
+          scp -o StrictHostKeyChecking=no compose.yml ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/.deploy
+
 #  build:
 #    runs-on: ubuntu-latest
 #
