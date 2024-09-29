@@ -46,6 +46,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Substitute github secrets
+        run: |
+          sed -i 's/<DB_USER>/${{ secrets.DB_USER }}/' compose.yml
+          sed -i 's/<DB_USER>/${{ secrets.DB_USER }}/' compose.yml
+          sed -i 's/<DB_PASSWORD>/${{ secrets.DB_ADMIN_PASSWORD }}/' compose.yml
+          sed -i 's/<DOCKER_HUB_USERNAME>/${{ secrets.DOCKER_HUB_USERNAME }}/' compose.yml
+
       - name: Copy docker-compose to server
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -55,13 +62,6 @@ jobs:
           port: 22
           source: "compose.yml"
           target: "/home/admin/.deploy/${{ github.event.repository.name }}/"
-
-      - name: Substitute github secrets
-        run: |
-          sed -i 's/<DB_USER>/${{ secrets.DB_USER }}/' compose.yml
-          sed -i 's/<DB_USER>/${{ secrets.DB_USER }}/' compose.yml
-          sed -i 's/<DB_PASSWORD>/${{ secrets.DB_ADMIN_PASSWORD }}/' compose.yml
-          sed -i 's/<DOCKER_HUB_USERNAME>/${{ secrets.DOCKER_HUB_USERNAME }}/' compose.yml
 
       - name: SSH to EC2 instance and Deploy Docker Container
         uses: appleboy/ssh-action@v0.1.7
