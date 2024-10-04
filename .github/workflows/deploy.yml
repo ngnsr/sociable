@@ -52,6 +52,7 @@ jobs:
           sed -i 's/<DB_PASSWORD>/${{ secrets.DB_PASSWORD }}/' compose.yml
           sed -i 's/<DB_ADMIN_PASSWORD>/${{ secrets.DB_ADMIN_PASSWORD }}/' compose.yml
           sed -i 's/<DOCKER_HUB_USERNAME>/${{ secrets.DOCKER_HUB_USERNAME }}/' compose.yml
+          sed -i 's/<EC2_HOST>/${{ secrets.EC2_HOST }}/' compose.yml
 
       - name: Copy docker-compose to server
         uses: appleboy/scp-action@v0.1.7
