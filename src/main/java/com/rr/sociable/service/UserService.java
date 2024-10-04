@@ -6,10 +6,10 @@ import com.rr.sociable.entity.User;
 import com.rr.sociable.exception.NotFoundException;
 import com.rr.sociable.exception.NotImplementedException;
 import com.rr.sociable.repo.UserRepository;
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +20,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class UserService extends DefaultOAuth2UserService {
+public class UserService extends OidcUserService {
+
     private final UserRepository userRepository;
     private final GroupService groupService;
 
@@ -79,12 +80,13 @@ public class UserService extends DefaultOAuth2UserService {
         return groups.stream().collect(Collectors.toMap(Group::getId, Group::getName));
     }
 
-    @Override
-    @Transactional
-    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        OAuth2User oAuth2User = super.loadUser(userRequest);
 
-        Map<String, Object> attributes = oAuth2User.getAttributes();
+    @Transactional
+    public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
+        final OidcUserService delegate = new OidcUserService();
+        OidcUser oidcUser = delegate.loadUser(userRequest);
+
+        Map<String, Object> attributes = oidcUser.getAttributes();
 
         String email = (String) attributes.get("email");
         String name = (String) attributes.get("name");
@@ -103,6 +105,6 @@ public class UserService extends DefaultOAuth2UserService {
 
         userRepository.save(user);
 
-        return oAuth2User;
+        return oidcUser;
     }
 }

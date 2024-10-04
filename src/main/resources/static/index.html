@@ -25,7 +25,7 @@
   var stompClient = null;
 
   function connect() {
-    var socket = new SockJS('http://localhost:5555/ws');  // Використовуємо SockJS для сумісності
+    var socket = new SockJS('http://localhost:80/ws');
     stompClient = Stomp.over(socket);
 
     stompClient.connect({}, function (frame) {
