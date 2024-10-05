@@ -17,12 +17,14 @@ jobs:
         uses: docker/setup-buildx-action@v1
 
       - name: Substitute github secrets
+#        slashes brake sed, use %
         run: |
-          sed -i 's/<EC2_HOST>/${{ secrets.EC2_HOST }}/g' src/main/resources/application.yml
-          sed -i 's/<DB_USER>/${{ secrets.DB_USER }}/g' src/main/resources/application.yml
-          sed -i 's/<DB_PASSWORD>/${{ secrets.DB_PASSWORD }}/g' src/main/resources/application.yml
-          sed -i 's/<GOOGLE_CLIENT_ID>/${{ secrets.GOOGLE_CLIENT_ID }}/g' src/main/resources/application.yml
-          sed -i 's/<GOOGLE_CLIENT_SECRET>/${{ secrets.GOOGLE_CLIENT_SECRET }}/g' src/main/resources/application.yml
+          sed -i -e 's%<EC2_HOST>%${{ secrets.EC2_HOST }}%g' \
+            -e 's/<DB_USER>/${{ secrets.DB_USER }}/g' \
+            -e 's/<DB_PASSWORD>/${{ secrets.DB_PASSWORD }}/g' \
+            -e 's/<GOOGLE_CLIENT_ID>/${{ secrets.GOOGLE_CLIENT_ID }}/g' \
+            -e 's/<GOOGLE_CLIENT_SECRET>/${{ secrets.GOOGLE_CLIENT_SECRET }}/g' \
+          src/main/resources/application.yml
 
       - name: Log in to DockerHub
         uses: docker/login-action@v2
@@ -45,10 +47,11 @@ jobs:
 
       - name: Substitute github secrets
         run: |
-          sed -i 's/<DB_USER>/${{ secrets.DB_USER }}/g' compose.yml
-          sed -i 's/<DB_PASSWORD>/${{ secrets.DB_PASSWORD }}/g' compose.yml
-          sed -i 's/<DB_ADMIN_PASSWORD>/${{ secrets.DB_ADMIN_PASSWORD }}/g' compose.yml
-          sed -i 's/<DOCKER_HUB_USERNAME>/${{ secrets.DOCKER_HUB_USERNAME }}/g' compose.yml
+          sed -i -e 's/<DB_USER>/${{ secrets.DB_USER }}/g' \
+            -e 's/<DB_PASSWORD>/${{ secrets.DB_PASSWORD }}/g' \
+            -e 's/<DB_ADMIN_PASSWORD>/${{ secrets.DB_ADMIN_PASSWORD }}/g' \
+            -e 's/<DOCKER_HUB_USERNAME>/${{ secrets.DOCKER_HUB_USERNAME }}/g' \
+          compose.yml
 
       - name: Copy docker-compose to server
         uses: appleboy/scp-action@v0.1.7
